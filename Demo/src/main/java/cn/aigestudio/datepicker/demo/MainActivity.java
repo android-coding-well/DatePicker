@@ -16,7 +16,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import cn.aigestudio.datepicker.bizs.calendars.DPCManager;
@@ -110,7 +109,7 @@ public class MainActivity extends Activity {
         DPCManager.getInstance().setDecorTR(tmpTR);
 
         DatePicker picker = (DatePicker) findViewById(R.id.main_dp);
-        picker.setDate(2015, 10);
+        picker.setDisplayDate("2017-12-11 ");
         picker.setFestivalDisplay(false);
         picker.setTodayDisplay(false);
         picker.setHolidayDisplay(false);
@@ -152,6 +151,20 @@ public class MainActivity extends Activity {
                 }
             }
         });
+        picker.setOnYearChangeListener(new DatePicker.OnYearChangeListener() {
+            @Override
+            public void onYearChange(int year) {
+                Toast.makeText(MainActivity.this, "year:"+year
+                        , Toast.LENGTH_SHORT).show();
+            }
+        });
+        picker.setOnMonthChangeListener(new DatePicker.OnMonthChangeListener() {
+            @Override
+            public void onMonthChange(int month) {
+                Toast.makeText(MainActivity.this, "month:"+month
+                        , Toast.LENGTH_SHORT).show();
+            }
+        });
 //        picker.setOnDateSelectedListener(new DatePicker.OnDateSelectedListener() {
 //            @Override
 //            public void onDateSelected(List<String> date) {
@@ -175,7 +188,7 @@ public class MainActivity extends Activity {
                 final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).create();
                 dialog.show();
                 DatePicker picker = new DatePicker(MainActivity.this);
-                picker.setDate(2015, 10);
+                picker.setDisplayDate(2015, 10);
                 picker.setMode(DPMode.SINGLE);
                 picker.setOnDatePickedListener(new DatePicker.OnDatePickedListener() {
                     @Override
@@ -190,5 +203,8 @@ public class MainActivity extends Activity {
                 dialog.getWindow().setGravity(Gravity.CENTER);
             }
         });
+
     }
+
+
 }

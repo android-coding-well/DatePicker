@@ -16,14 +16,20 @@ import android.graphics.drawable.shapes.OvalShape;
 import android.os.Build;
 import android.os.Parcelable;
 import android.text.TextUtils;
+import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Scroller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +46,29 @@ import cn.aigestudio.datepicker.entities.DPInfo;
  * @author AigeStudio 2015-06-29
  */
 public class MonthView extends View {
+    private static final String TAG = "MonthView";
+
+    public interface OnDateChangeListener {
+        /**
+         * 月份变化
+         *
+         * @param month
+         */
+        void onMonthChange(int month);
+
+        /**
+         * 年份变化
+         *
+         * @param year
+         */
+        void onYearChange(int year);
+    }
+
+    private enum SlideMode {
+        VER,
+        HOR
+    }
+
     private final Region[][] MONTH_REGIONS_4 = new Region[4][7];
     private final Region[][] MONTH_REGIONS_5 = new Region[5][7];
     private final Region[][] MONTH_REGIONS_6 = new Region[6][7];
@@ -66,14 +95,14 @@ public class MonthView extends View {
     private SlideMode mSlideMode;
     private DPDecor mDPDecor;
 
-    private int circleRadius;
+    private int circleRadius;//圆圈半径
     private int indexYear, indexMonth;
-    private int centerYear, centerMonth;
-    private int leftYear, leftMonth;
-    private int rightYear, rightMonth;
-    private int topYear, topMonth;
-    private int bottomYear, bottomMonth;
-    private int width, height;
+    private int centerYear, centerMonth;//当前年月
+    private int leftYear, leftMonth;//上一月
+    private int rightYear, rightMonth;//下一月
+    private int topYear, topMonth;//上一年
+    private int bottomYear, bottomMonth;//下一年
+    private int width, height;//视图宽高
     private int sizeDecor, sizeDecor2x, sizeDecor3x;
     private int lastPointX, lastPointY;
     private int lastMoveX, lastMoveY;
@@ -95,9 +124,26 @@ public class MonthView extends View {
     private List<String> dateSelected = new ArrayList<>();
 
     public MonthView(Context context) {
-        super(context);
+        this(context, null, 0);
+
+    }
+
+    public MonthView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public MonthView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init(context);
+    }
+
+    private void init(Context context) {
+
+        //默认为当前年月
+        setDisplayDate(new Date());
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            scaleAnimationListener = new ScaleAnimationListener();
+            scaleAnimationListener = new MonthView.ScaleAnimationListener();
         }
         mScroller = new Scroller(context);
         mPaint.setTextAlign(Paint.Align.CENTER);
@@ -166,7 +212,7 @@ public class MonthView extends View {
                             }
                         }
                         buildRegion();
-                        computeDate();
+                        computeDate(mSlideMode);
                         smoothScrollTo(width * indexMonth, height * indexYear);
                         lastMoveY = height * indexYear;
                     } else {
@@ -192,7 +238,7 @@ public class MonthView extends View {
                             }
                         }
                         buildRegion();
-                        computeDate();
+                        computeDate(mSlideMode);
                         smoothScrollTo(width * indexMonth, indexYear * height);
                         lastMoveX = width * indexMonth;
                     } else {
@@ -277,10 +323,15 @@ public class MonthView extends View {
     protected void onDraw(Canvas canvas) {
         canvas.drawColor(mTManager.colorBG());
 
+        //绘制前一年
         draw(canvas, width * indexMonth, (indexYear - 1) * height, topYear, topMonth);
+        //绘制前一月
         draw(canvas, width * (indexMonth - 1), height * indexYear, leftYear, leftMonth);
+        //绘制当前月视图
         draw(canvas, width * indexMonth, indexYear * height, centerYear, centerMonth);
+        //绘制下一月
         draw(canvas, width * (indexMonth + 1), height * indexYear, rightYear, rightMonth);
+        //绘制下一年
         draw(canvas, width * indexMonth, (indexYear + 1) * height, bottomYear, bottomMonth);
 
         drawBGCircle(canvas);
@@ -471,31 +522,73 @@ public class MonthView extends View {
         }
     }
 
-    List<String> getDateSelected() {
+    /**
+     * 获得选择的日期列表
+     *
+     * @return
+     */
+    public List<String> getDateSelected() {
         return dateSelected;
     }
 
+    /**
+     * 设置日期变化监听器
+     *
+     * @param onDateChangeListener
+     */
     void setOnDateChangeListener(OnDateChangeListener onDateChangeListener) {
         this.onDateChangeListener = onDateChangeListener;
     }
 
+    /**
+     * 设置日期选择监听器
+     *
+     * @param onDatePickedListener
+     */
     public void setOnDatePickedListener(DatePicker.OnDatePickedListener onDatePickedListener) {
         this.onDatePickedListener = onDatePickedListener;
     }
 
-    void setDPMode(DPMode mode) {
+    /**
+     * 设置日期选择模式
+     *
+     * @param mode
+     */
+    public void setDPMode(DPMode mode) {
         this.mDPMode = mode;
     }
 
-    void setDPDecor(DPDecor decor) {
+    /**
+     * 设置装饰器
+     *
+     * @param decor
+     */
+    public void setDPDecor(DPDecor decor) {
         this.mDPDecor = decor;
     }
 
-    DPMode getDPMode() {
+    /**
+     * 获得装饰器
+     *
+     * @return
+     */
+    public DPMode getDPMode() {
         return mDPMode;
     }
 
-    void setDate(int year, int month) {
+    /**
+     * 设置显示年月
+     *
+     * @param year  年份
+     * @param month 月份 1-12
+     */
+    public void setDisplayDate(int year, int month) {
+        if (month < 1) {
+            month = 1;
+        }
+        if (month > 12) {
+            month = 12;
+        }
         centerYear = year;
         centerMonth = month;
         indexYear = 0;
@@ -506,19 +599,104 @@ public class MonthView extends View {
         invalidate();
     }
 
-    void setFestivalDisplay(boolean isFestivalDisplay) {
+    /**
+     * 设置显示年月
+     *
+     * @param date 日期
+     */
+    public void setDisplayDate(Date date) {
+        if (date == null) {
+            Log.e(TAG, "setDate: date is null");
+            return;
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        setDisplayDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1);
+    }
+
+    /**
+     * 设置显示年月
+     *
+     * @param timestamp 时间戳
+     */
+    public void setDisplayDate(long timestamp) {
+        if (timestamp == 0) {
+            Log.e(TAG, "setDate: timestamp is 0");
+            return;
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timestamp);
+        setDisplayDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1);
+    }
+
+    /**
+     * 设置显示年月
+     *
+     * @param dateFormat 格式化日志字符串，“yyyy-MM-dd”
+     * @throws ParseException 字符串不符合规则
+     */
+    public void setDisplayDate(String dateFormat) throws ParseException {
+        if (TextUtils.isEmpty(dateFormat)) {
+            Log.e(TAG, "setDate: dateFormat is empty");
+            return;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(sdf.parse(dateFormat));
+        setDisplayDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1);
+    }
+
+
+
+    /**
+     * 获得当前显示年份
+     * @return
+     */
+    public int getDisplayYear() {
+        return centerYear;
+    }
+
+    /**
+     * 获得当前显示月份（1-12）
+     * @return
+     */
+    public int getDisplayMonth() {
+        return centerMonth;
+    }
+
+    /**
+     * 设置是否显示节日
+     *
+     * @param isFestivalDisplay
+     */
+    public void setFestivalDisplay(boolean isFestivalDisplay) {
         this.isFestivalDisplay = isFestivalDisplay;
     }
 
-    void setTodayDisplay(boolean isTodayDisplay) {
+    /**
+     * 设置是否显示当天
+     *
+     * @param isTodayDisplay
+     */
+    public void setTodayDisplay(boolean isTodayDisplay) {
         this.isTodayDisplay = isTodayDisplay;
     }
 
-    void setHolidayDisplay(boolean isHolidayDisplay) {
+    /**
+     * 设置是否显示假日
+     *
+     * @param isHolidayDisplay
+     */
+    public void setHolidayDisplay(boolean isHolidayDisplay) {
         this.isHolidayDisplay = isHolidayDisplay;
     }
 
-    void setDeferredDisplay(boolean isDeferredDisplay) {
+    /**
+     * 设置是否延期显示
+     *
+     * @param isDeferredDisplay
+     */
+    public void setDeferredDisplay(boolean isDeferredDisplay) {
         this.isDeferredDisplay = isDeferredDisplay;
     }
 
@@ -725,6 +903,7 @@ public class MonthView extends View {
     }
 
     private void computeDate() {
+
         rightYear = leftYear = centerYear;
         topYear = centerYear - 1;
         bottomYear = centerYear + 1;
@@ -749,16 +928,35 @@ public class MonthView extends View {
         }
     }
 
-    interface OnDateChangeListener {
-        void onMonthChange(int month);
+    private void computeDate(SlideMode slideMode) {
 
-        void onYearChange(int year);
+        rightYear = leftYear = centerYear;
+        topYear = centerYear - 1;
+        bottomYear = centerYear + 1;
+
+        topMonth = centerMonth;
+        bottomMonth = centerMonth;
+
+        rightMonth = centerMonth + 1;
+        leftMonth = centerMonth - 1;
+
+        if (centerMonth == 12) {
+            rightYear++;
+            rightMonth = 1;
+        }
+        if (centerMonth == 1) {
+            leftYear--;
+            leftMonth = 12;
+        }
+        if (null != onDateChangeListener) {
+            if (SlideMode.VER == slideMode) {
+                onDateChangeListener.onYearChange(centerYear);
+            } else {
+                onDateChangeListener.onMonthChange(centerMonth);
+            }
+        }
     }
 
-    private enum SlideMode {
-        VER,
-        HOR
-    }
 
     private class BGCircle {
         private float x, y;

@@ -9,5 +9,10 @@ package cn.aigestudio.datepicker.cons;
  * @author AigeStudio 2015-07-02
  */
 public enum DPMode {
-    SINGLE, MULTIPLE, NONE
+    /**单选*/
+    SINGLE,
+    /**多选*/
+    MULTIPLE,
+    /**展示*/
+    NONE
 }

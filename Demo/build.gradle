@@ -1,15 +1,19 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
+
+    dataBinding {
+        enabled = true
+    }
 
     defaultConfig {
         applicationId "cn.aigestudio.datepicker.demo"
-        minSdkVersion 11
-        targetSdkVersion 21
-        versionCode 4
-        versionName "2.0.0"
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        versionCode 5
+        versionName "3.0.0"
     }
     buildTypes {
         release {
@@ -20,7 +24,8 @@ android {
 }
 
 dependencies {
+    implementation "com.android.support.constraint:constraint-layout:$rootProject.supportConstraintVersion"
     compile fileTree(include: ['*.jar'], dir: 'libs')
-//    compile 'cn.aigestudio.datepicker:DatePicker:2.0.1'
     compile project(':DatePicker')
+    implementation "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
 }

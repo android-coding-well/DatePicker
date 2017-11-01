@@ -17,7 +17,7 @@ public class EN extends DPLManager {
 
     @Override
     public String titleEnsure() {
-        return "Ok";
+        return "OK";
     }
 
     @Override
@@ -27,6 +27,6 @@ public class EN extends DPLManager {
 
     @Override
     public String[] titleWeek() {
-        return new String[]{"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
+        return new String[]{ "SUN","MON", "TUE", "WED", "THU", "FRI", "SAT"};
     }
 }

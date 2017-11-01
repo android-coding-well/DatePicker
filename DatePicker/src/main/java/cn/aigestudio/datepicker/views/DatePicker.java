@@ -5,15 +5,25 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextSwitcher;
 import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import cn.aigestudio.datepicker.bizs.decors.DPDecor;
+import cn.aigestudio.datepicker.bizs.languages.CN;
 import cn.aigestudio.datepicker.bizs.languages.DPLManager;
+import cn.aigestudio.datepicker.bizs.languages.EN;
 import cn.aigestudio.datepicker.bizs.themes.DPTManager;
+import cn.aigestudio.datepicker.cons.DPLanguage;
 import cn.aigestudio.datepicker.cons.DPMode;
 import cn.aigestudio.datepicker.utils.MeasureUtil;
 
@@ -21,19 +31,9 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 /**
  * DatePicker
- *
- * @author AigeStudio 2015-06-29
  */
 public class DatePicker extends LinearLayout {
-    private DPTManager mTManager;// 主题管理器
-    private DPLManager mLManager;// 语言管理器
 
-    private MonthView monthView;// 月视图
-    private TextView tvYear, tvMonth;// 年份 月份显示
-    private TextView tvEnsure;// 确定按钮显示
-
-
-    private OnDateSelectedListener onDateSelectedListener;// 日期多选后监听
 
     /**
      * 日期单选监听器
@@ -49,6 +49,42 @@ public class DatePicker extends LinearLayout {
         void onDateSelected(List<String> date);
     }
 
+    /**
+     * 年份变化监听器
+     */
+    public interface OnYearChangeListener {
+        /**
+         * @param year
+         */
+        void onYearChange(int year);
+    }
+
+    /**
+     * 月份变化监听器
+     */
+    public interface OnMonthChangeListener {
+        /**
+         * @param month 1~12
+         */
+        void onMonthChange(int month);
+    }
+
+    private DPTManager mTManager;// 主题管理器
+    private DPLManager mLManager;// 语言管理器
+
+    private MonthView monthView;// 月视图
+    private TextSwitcher tsYear, tsMonth;
+    private TextView tvEnsure;// 确定按钮显示
+
+
+    private OnDateSelectedListener onDateSelectedListener;// 日期多选后监听
+    private OnYearChangeListener onYearChangeListener;
+    private OnMonthChangeListener onMonthChangeListener;
+
+    private RelativeLayout rlTitle;
+    private LinearLayout llWeek;
+
+
     public DatePicker(Context context) {
         this(context, null);
     }
@@ -60,24 +96,90 @@ public class DatePicker extends LinearLayout {
 
         // 设置排列方向为竖向
         setOrientation(VERTICAL);
-
         LayoutParams llParams =
                 new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        // --------------------------------------------------------------------------------标题栏
+        initTitleBar(context, llParams);
+        // --------------------------------------------------------------------------------周视图
+        initWeekBar(context, llParams);
+        // ------------------------------------------------------------------------------------月视图
+        initMonthView(context, llParams);
 
-        // 标题栏根布局
-        RelativeLayout rlTitle = new RelativeLayout(context);
-        rlTitle.setBackgroundColor(mTManager.colorTitleBG());
-        int rlTitlePadding = MeasureUtil.dp2px(context, 10);
-        rlTitle.setPadding(rlTitlePadding, rlTitlePadding, rlTitlePadding, rlTitlePadding);
+    }
 
+    /**
+     * 初始化月视图
+     *
+     * @param context
+     * @param llParams
+     */
+    private void initMonthView(Context context, LayoutParams llParams) {
+
+        monthView = new MonthView(context);
+        monthView.setOnDateChangeListener(new MonthView.OnDateChangeListener() {
+            @Override
+            public void onMonthChange(int month) {
+                if (onMonthChangeListener != null) {
+                    onMonthChangeListener.onMonthChange(month);
+                }
+                tsMonth.setText(mLManager.titleMonth()[month - 1]);
+
+            }
+
+            @Override
+            public void onYearChange(int year) {
+                if (onYearChangeListener != null) {
+                    onYearChangeListener.onYearChange(year);
+                }
+                String tmp = String.valueOf(year);
+                if (tmp.startsWith("-")) {
+                    tmp = tmp.replace("-", mLManager.titleBC());
+                }
+                tsYear.setText(tmp);
+            }
+        });
+        addView(monthView, llParams);
+    }
+
+    /**
+     * 初始化周视图
+     *
+     * @param context
+     * @param llParams
+     */
+    private void initWeekBar(Context context, LayoutParams llParams) {
         // 周视图根布局
-        LinearLayout llWeek = new LinearLayout(context);
+        llWeek = new LinearLayout(context);
         llWeek.setBackgroundColor(mTManager.colorTitleBG());
         llWeek.setOrientation(HORIZONTAL);
         int llWeekPadding = MeasureUtil.dp2px(context, 5);
         llWeek.setPadding(0, llWeekPadding, 0, llWeekPadding);
         LayoutParams lpWeek = new LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
         lpWeek.weight = 1;
+
+        for (int i = 0; i < mLManager.titleWeek().length; i++) {
+            TextView tvWeek = new TextView(context);
+            tvWeek.setText(mLManager.titleWeek()[i]);
+            tvWeek.setGravity(Gravity.CENTER);
+            tvWeek.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+            tvWeek.setTextColor(mTManager.colorTitle());
+            llWeek.addView(tvWeek, lpWeek);
+        }
+        addView(llWeek, llParams);
+
+    }
+
+    /**
+     * 初始化标题栏视图
+     *
+     * @param context
+     */
+    private void initTitleBar(final Context context, LayoutParams llParams) {
+        // 标题栏根布局
+        rlTitle = new RelativeLayout(context);
+        rlTitle.setBackgroundColor(mTManager.colorTitleBG());
+        int rlTitlePadding = MeasureUtil.dp2px(context, 10);
+        rlTitle.setPadding(rlTitlePadding, rlTitlePadding, rlTitlePadding, rlTitlePadding);
 
         // 标题栏子元素布局参数
         RelativeLayout.LayoutParams lpYear =
@@ -91,19 +193,39 @@ public class DatePicker extends LinearLayout {
         lpEnsure.addRule(RelativeLayout.CENTER_VERTICAL);
         lpEnsure.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
-        // --------------------------------------------------------------------------------标题栏
+        Animation in = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_in);
+        Animation out = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out);
+
+        final Calendar calendar = Calendar.getInstance();
         // 年份显示
-        tvYear = new TextView(context);
-        tvYear.setText("2015");
-        tvYear.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
-        tvYear.setTextColor(mTManager.colorTitle());
+        tsYear = new TextSwitcher(context);
+        tsYear.setInAnimation(in);
+        tsYear.setOutAnimation(out);
+        tsYear.setFactory(new ViewSwitcher.ViewFactory() {
+            @Override
+            public View makeView() {
+                TextView d = new TextView(context);
+                d.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+                d.setTextColor(mTManager.colorTitle());
+                return d;
+            }
+        });
+        tsYear.setText(calendar.get(Calendar.YEAR) + "");
 
         // 月份显示
-        tvMonth = new TextView(context);
-        tvMonth.setText("六月");
-        tvMonth.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
-        tvMonth.setTextColor(mTManager.colorTitle());
-
+        tsMonth = new TextSwitcher(context);
+        tsMonth.setInAnimation(in);
+        tsMonth.setOutAnimation(out);
+        tsMonth.setFactory(new ViewSwitcher.ViewFactory() {
+            @Override
+            public View makeView() {
+                TextView d = new TextView(context);
+                d.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+                d.setTextColor(mTManager.colorTitle());
+                return d;
+            }
+        });
+        tsMonth.setText(mLManager.titleMonth()[calendar.get(Calendar.MONTH)]);
         // 确定显示
         tvEnsure = new TextView(context);
         tvEnsure.setText(mLManager.titleEnsure());
@@ -118,59 +240,72 @@ public class DatePicker extends LinearLayout {
             }
         });
 
-        rlTitle.addView(tvYear, lpYear);
-        rlTitle.addView(tvMonth, lpMonth);
+        rlTitle.addView(tsYear, lpYear);
+        rlTitle.addView(tsMonth, lpMonth);
         rlTitle.addView(tvEnsure, lpEnsure);
 
         addView(rlTitle, llParams);
-
-        // --------------------------------------------------------------------------------周视图
-        for (int i = 0; i < mLManager.titleWeek().length; i++) {
-            TextView tvWeek = new TextView(context);
-            tvWeek.setText(mLManager.titleWeek()[i]);
-            tvWeek.setGravity(Gravity.CENTER);
-            tvWeek.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
-            tvWeek.setTextColor(mTManager.colorTitle());
-            llWeek.addView(tvWeek, lpWeek);
-        }
-        addView(llWeek, llParams);
-
-        // ------------------------------------------------------------------------------------月视图
-        monthView = new MonthView(context);
-        monthView.setOnDateChangeListener(new MonthView.OnDateChangeListener() {
-            @Override
-            public void onMonthChange(int month) {
-                tvMonth.setText(mLManager.titleMonth()[month - 1]);
-            }
-
-            @Override
-            public void onYearChange(int year) {
-                String tmp = String.valueOf(year);
-                if (tmp.startsWith("-")) {
-                    tmp = tmp.replace("-", mLManager.titleBC());
-                }
-                tvYear.setText(tmp);
-            }
-        });
-        addView(monthView, llParams);
     }
 
+    private void updateTitleAndWeekView() {
+        for (int i = 0; i < llWeek.getChildCount(); i++) {
+            ((TextView) llWeek.getChildAt(i)).setText(mLManager.titleWeek()[i]);
+        }
+        ((TextSwitcher) rlTitle.getChildAt(1)).setText(mLManager.titleMonth()[getDisplayMonth() - 1]);
+        ((TextView) rlTitle.getChildAt(2)).setText(mLManager.titleEnsure());
+    }
+
+    //************************************************************************************************
+    //-------------------------------------------开放接口---------------------------------------------
+    //************************************************************************************************
+
     /**
-     * 设置初始化年月日期
+     * 设置显示年月
      *
      * @param year  ...
      * @param month ...
      */
-    public void setDate(int year, int month) {
-        if (month < 1) {
-            month = 1;
-        }
-        if (month > 12) {
-            month = 12;
-        }
-        monthView.setDate(year, month);
+    public void setDisplayDate(int year, int month) {
+        monthView.setDisplayDate(year, month);
     }
 
+    /**
+     * 设置显示年月
+     *
+     * @param date 日期
+     */
+    public void setDisplayDate(Date date) {
+        monthView.setDisplayDate(date);
+    }
+
+    /**
+     * 设置显示年月
+     *
+     * @param timestamp 时间戳
+     */
+    public void setDisplayDate(long timestamp) {
+        monthView.setDisplayDate(timestamp);
+    }
+
+    /**
+     * 设置显示年月
+     *
+     * @param dateFormat 格式化日志字符串，“yyyy-MM-dd”
+     * @throws ParseException 字符串不符合规则
+     */
+    public void setDisplayDate(String dateFormat) {
+        try {
+            monthView.setDisplayDate(dateFormat);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 设置装饰器
+     *
+     * @param decor
+     */
     public void setDPDecor(DPDecor decor) {
         monthView.setDPDecor(decor);
     }
@@ -181,27 +316,109 @@ public class DatePicker extends LinearLayout {
      * @param mode ...
      */
     public void setMode(DPMode mode) {
-        if (mode != DPMode.MULTIPLE) {
-            tvEnsure.setVisibility(GONE);
-        }
+        tvEnsure.setVisibility(mode == DPMode.MULTIPLE ? VISIBLE : GONE);
         monthView.setDPMode(mode);
     }
 
+    /**
+     * 显示节日
+     *
+     * @param isFestivalDisplay
+     */
     public void setFestivalDisplay(boolean isFestivalDisplay) {
         monthView.setFestivalDisplay(isFestivalDisplay);
     }
 
+    /**
+     * 显示今天
+     *
+     * @param isTodayDisplay
+     */
     public void setTodayDisplay(boolean isTodayDisplay) {
         monthView.setTodayDisplay(isTodayDisplay);
     }
 
+    /**
+     * 显示假日
+     *
+     * @param isHolidayDisplay
+     */
     public void setHolidayDisplay(boolean isHolidayDisplay) {
         monthView.setHolidayDisplay(isHolidayDisplay);
     }
 
+    /**
+     * 显示延期
+     *
+     * @param isDeferredDisplay
+     */
     public void setDeferredDisplay(boolean isDeferredDisplay) {
         monthView.setDeferredDisplay(isDeferredDisplay);
     }
+
+    /**
+     * 设置标题栏是否显示
+     *
+     * @param isShow
+     */
+    public void showTitleBar(boolean isShow) {
+        rlTitle.setVisibility(isShow ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * 设置周视图栏是否显示
+     *
+     * @param isShow
+     */
+    public void showWeekBar(boolean isShow) {
+        llWeek.setVisibility(isShow ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * 获得当前显示年份
+     *
+     * @return
+     */
+    public int getDisplayYear() {
+        return monthView.getDisplayYear();
+    }
+
+    /**
+     * 获得当前显示月份（1-12）
+     *
+     * @return
+     */
+    public int getDisplayMonth() {
+        return monthView.getDisplayMonth();
+    }
+
+    /**
+     * 设置语言
+     *
+     * @param language
+     */
+    public void setLanguage(DPLanguage language) {
+        switch (language) {
+            case CHINESE:
+                setLanguage(new CN());
+                break;
+            case ENGLISH:
+                setLanguage(new EN());
+                break;
+        }
+
+    }
+
+    /**
+     * 设置语言
+     *
+     * @param language
+     */
+    public void setLanguage(DPLManager language) {
+        this.mLManager = language;
+        updateTitleAndWeekView();
+    }
+
 
     /**
      * 设置单选监听器
@@ -209,10 +426,10 @@ public class DatePicker extends LinearLayout {
      * @param onDatePickedListener ...
      */
     public void setOnDatePickedListener(OnDatePickedListener onDatePickedListener) {
-        if (monthView.getDPMode() != DPMode.SINGLE) {
+       /* if (monthView.getDPMode() != DPMode.SINGLE) {
             throw new RuntimeException(
                     "Current DPMode does not SINGLE! Please call setMode set DPMode to SINGLE!");
-        }
+        }*/
         monthView.setOnDatePickedListener(onDatePickedListener);
     }
 
@@ -222,10 +439,30 @@ public class DatePicker extends LinearLayout {
      * @param onDateSelectedListener ...
      */
     public void setOnDateSelectedListener(OnDateSelectedListener onDateSelectedListener) {
-        if (monthView.getDPMode() != DPMode.MULTIPLE) {
+        /*if (monthView.getDPMode() != DPMode.MULTIPLE) {
             throw new RuntimeException(
                     "Current DPMode does not MULTIPLE! Please call setMode set DPMode to MULTIPLE!");
-        }
+        }*/
         this.onDateSelectedListener = onDateSelectedListener;
     }
+
+    /**
+     * 设置年份改变监听器
+     *
+     * @param onYearChangeListener
+     */
+    public void setOnYearChangeListener(OnYearChangeListener onYearChangeListener) {
+        this.onYearChangeListener = onYearChangeListener;
+    }
+
+    /**
+     * 设置月份改变监听器
+     *
+     * @param onMonthChangeListener
+     */
+    public void setOnMonthChangeListener(OnMonthChangeListener onMonthChangeListener) {
+        this.onMonthChangeListener = onMonthChangeListener;
+    }
+
+
 }

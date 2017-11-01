@@ -17,4 +17,11 @@
         android:layout_gravity="center_horizontal"
         android:text="DatePicker" />
 
+    <cn.aigestudio.datepicker.views.MonthView
+        android:id="@+id/mv_month"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </cn.aigestudio.datepicker.views.MonthView>
+
 </LinearLayout>

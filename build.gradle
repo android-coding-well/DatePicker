@@ -25,6 +25,4 @@ ext {
 // App dependencies
     supportLibraryVersion = '26.1.0'
     supportConstraintVersion='1.0.2'
-    junitVersion = '4.12'
-    espressoVersion = '2.2.2'
 }

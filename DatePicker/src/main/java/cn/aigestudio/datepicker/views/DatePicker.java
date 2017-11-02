@@ -18,6 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import cn.aigestudio.datepicker.bizs.calendars.DPCManager;
 import cn.aigestudio.datepicker.bizs.decors.DPDecor;
 import cn.aigestudio.datepicker.bizs.languages.CN;
 import cn.aigestudio.datepicker.bizs.languages.DPLManager;
@@ -426,6 +427,7 @@ public class DatePicker extends LinearLayout {
      * @param language
      */
     public void setLanguage(DPLanguage language) {
+        DPCManager.getInstance().setLanguage(language);
         switch (language) {
             case CHINESE:
                 setLanguage(new CN());

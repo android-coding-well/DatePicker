@@ -182,7 +182,15 @@ public class DatePickerActivity extends AppCompatActivity {
         List<String> tmp = new ArrayList<>();
         tmp.add("2017-07-01");
         tmp.add("2017-10-16");
+        tmp.add("2017-10-11");
         tmp.add("2017-7-09");
         DPCManager.getInstance().setDecorTR(tmp);
+        List<String> tmp2 = new ArrayList<>();
+        tmp2.add("2016-07-01");
+        tmp2.add("2016-10-16");
+        tmp2.add("2016-10-11");
+        tmp2.add("2016-7-09");
+        tmp2.add("2017-7-10");
+        DPCManager.getInstance().setDecorTR(tmp2);
     }
 }

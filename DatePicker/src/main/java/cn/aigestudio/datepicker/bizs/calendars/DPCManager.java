@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import cn.aigestudio.datepicker.cons.DPLanguage;
 import cn.aigestudio.datepicker.entities.DPInfo;
 import cn.aigestudio.datepicker.views.DatePicker;
 
@@ -21,12 +22,12 @@ import cn.aigestudio.datepicker.views.DatePicker;
 public final class DPCManager {
     private static final HashMap<Integer, HashMap<Integer, DPInfo[][]>> DATE_CACHE = new HashMap<>();
 
-    private static final HashMap<String, Set<String>> DECOR_CACHE_BG = new HashMap<>();
-    private static final HashMap<String, Set<String>> DECOR_CACHE_TL = new HashMap<>();
-    private static final HashMap<String, Set<String>> DECOR_CACHE_T = new HashMap<>();
-    private static final HashMap<String, Set<String>> DECOR_CACHE_TR = new HashMap<>();
-    private static final HashMap<String, Set<String>> DECOR_CACHE_L = new HashMap<>();
-    private static final HashMap<String, Set<String>> DECOR_CACHE_R = new HashMap<>();
+    private static final HashMap<String, Set<String>> DECOR_CACHE_BG = new HashMap<>();//背景
+    private static final HashMap<String, Set<String>> DECOR_CACHE_TL = new HashMap<>();//左上区域
+    private static final HashMap<String, Set<String>> DECOR_CACHE_T = new HashMap<>();//顶部区域
+    private static final HashMap<String, Set<String>> DECOR_CACHE_TR = new HashMap<>();//右上区域
+    private static final HashMap<String, Set<String>> DECOR_CACHE_L = new HashMap<>();//左区域
+    private static final HashMap<String, Set<String>> DECOR_CACHE_R = new HashMap<>();//右区域
 
     private static DPCManager sManager;
 
@@ -41,6 +42,82 @@ public final class DPCManager {
             initCalendar(new DPUSCalendar());
         }
     }
+
+    /**
+     * 清除所有数据
+     */
+    public void clearAllCache() {
+        DATE_CACHE.clear();
+        DECOR_CACHE_BG.clear();
+        DECOR_CACHE_TL.clear();
+        DECOR_CACHE_T.clear();
+        DECOR_CACHE_TR.clear();
+        DECOR_CACHE_L.clear();
+        DECOR_CACHE_R.clear();
+    }
+
+    /**
+     * 清除缓存数据
+     */
+    public void clearDateCache() {
+        DATE_CACHE.clear();
+    }
+
+    /**
+     * 清除背景缓存数据
+     */
+    public void clearBGCache() {
+        DECOR_CACHE_BG.clear();
+    }
+
+    /**
+     * 清除左上区域数据
+     */
+    public void clearTopLeftCache() {
+        DECOR_CACHE_TL.clear();
+    }
+
+    /**
+     * 清除顶部区域数据
+     */
+    public void clearTopCache() {
+        DECOR_CACHE_T.clear();
+    }
+
+    /**
+     * 清除右上区域数据
+     */
+    public void clearTopRightCache() {
+        DECOR_CACHE_TR.clear();
+    }
+
+    /**
+     * 清除左区域数据
+     */
+    public void clearLeftCache() {
+        DECOR_CACHE_L.clear();
+    }
+
+    /**
+     * 清除右区域数据
+     */
+    public void clearRightCache() {
+        DECOR_CACHE_R.clear();
+    }
+
+
+    public void setLanguage(DPLanguage language) {
+        clearDateCache();
+        switch (language) {
+            case ENGLISH:
+                initCalendar(new DPUSCalendar());
+                break;
+            case CHINESE:
+                initCalendar(new DPCNCalendar());
+                break;
+        }
+    }
+
 
     /**
      * 获取月历管理器
@@ -159,12 +236,12 @@ public final class DPCManager {
 
     private void setDecor(List<String> date, HashMap<String, Set<String>> cache) {
         for (String str : date) {
-           // int index = str.lastIndexOf("-");
-            String[] arr=str.split("-");
-            arr[1]=String.valueOf(Integer.parseInt(arr[1]));
-            arr[2]=String.valueOf(Integer.parseInt(arr[2]));
+            // int index = str.lastIndexOf("-");
+            String[] arr = str.split("-");
+            arr[1] = String.valueOf(Integer.parseInt(arr[1]));
+            arr[2] = String.valueOf(Integer.parseInt(arr[2]));
             //String key = str.substring(0, index).replace("-", ":");
-            String key = arr[0]+":"+arr[1];
+            String key = arr[0] + ":" + arr[1];
             Set<String> days = cache.get(key);
             if (null == days) {
                 days = new HashSet<>();

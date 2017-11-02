@@ -1,3 +1,6 @@
+修改记录：重写演示demo,优化代码，增加部分接口，增加中英切换功能，修复日期数字前不能有0的bug
+
+
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-DatePicker-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1864)
 
 *You can jump to EN README after CN if you don't read chinese.*

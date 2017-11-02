@@ -159,13 +159,18 @@ public final class DPCManager {
 
     private void setDecor(List<String> date, HashMap<String, Set<String>> cache) {
         for (String str : date) {
-            int index = str.lastIndexOf("-");
-            String key = str.substring(0, index).replace("-", ":");
+           // int index = str.lastIndexOf("-");
+            String[] arr=str.split("-");
+            arr[1]=String.valueOf(Integer.parseInt(arr[1]));
+            arr[2]=String.valueOf(Integer.parseInt(arr[2]));
+            //String key = str.substring(0, index).replace("-", ":");
+            String key = arr[0]+":"+arr[1];
             Set<String> days = cache.get(key);
             if (null == days) {
                 days = new HashSet<>();
             }
-            days.add(str.substring(index + 1, str.length()));
+            //days.add(str.substring(index + 1, str.length()));
+            days.add(arr[2]);
             cache.put(key, days);
         }
     }

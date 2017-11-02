@@ -11,8 +11,10 @@ import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import cn.aigestudio.datepicker.bizs.calendars.DPCManager;
 import cn.aigestudio.datepicker.bizs.decors.DPDecor;
 import cn.aigestudio.datepicker.cons.DPLanguage;
 import cn.aigestudio.datepicker.cons.DPMode;
@@ -173,6 +175,14 @@ public class DatePickerActivity extends AppCompatActivity {
                         break;
                 }
             }
+
+
         });
+
+        List<String> tmp = new ArrayList<>();
+        tmp.add("2017-07-01");
+        tmp.add("2017-10-16");
+        tmp.add("2017-7-09");
+        DPCManager.getInstance().setDecorTR(tmp);
     }
 }

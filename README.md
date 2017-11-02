@@ -56,15 +56,14 @@ dependencies {
 * 故建议在个人的工程目录下的build.gradle下加入以下变量，具体请看此[build.gradle](https://github.com/huweijian5/DatePicker/blob/master/build.gradle)
 ```
 ext{
-    minSdkVersion = 16
-    targetSdkVersion = 25
-    compileSdkVersion = 25
-    buildToolsVersion = '25.0.1'
+   minSdkVersion = 18
+    targetSdkVersion = 26
+    compileSdkVersion = 26
+    buildToolsVersion = '26.0.2'
 
     // App dependencies
-    supportLibraryVersion = '25.0.1'
-    junitVersion = '4.12'
-    espressoVersion = '2.2.2'
+    supportLibraryVersion = '26.1.0'
+    supportConstraintVersion='1.0.2'
 }
 ```	
 * 请注意，对于此库已有的变量，命名请保持一致

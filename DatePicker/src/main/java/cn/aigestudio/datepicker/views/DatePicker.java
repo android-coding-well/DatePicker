@@ -24,6 +24,7 @@ import cn.aigestudio.datepicker.bizs.languages.CN;
 import cn.aigestudio.datepicker.bizs.languages.DPLManager;
 import cn.aigestudio.datepicker.bizs.languages.EN;
 import cn.aigestudio.datepicker.bizs.themes.DPTManager;
+import cn.aigestudio.datepicker.bizs.themes.DPTheme;
 import cn.aigestudio.datepicker.cons.DPLanguage;
 import cn.aigestudio.datepicker.cons.DPMode;
 import cn.aigestudio.datepicker.utils.MeasureUtil;
@@ -39,13 +40,12 @@ public class DatePicker extends LinearLayout {
     /**
      * 日期变化监听器
      */
-    public interface OnDateChangeListener{
+    public interface OnDateChangeListener {
         /**
-         *
-         * @param year 年份
+         * @param year  年份
          * @param month 月份1-12
          */
-        void onDateChange(int year,int month);
+        void onDateChange(int year, int month);
     }
 
     /**
@@ -53,7 +53,6 @@ public class DatePicker extends LinearLayout {
      */
     public interface OnDatePickedListener {
         /**
-         *
          * @param date 格式“yyyy-MM-dd”
          */
         void onDatePicked(String date);
@@ -64,7 +63,6 @@ public class DatePicker extends LinearLayout {
      */
     public interface OnDateSelectedListener {
         /**
-         *
          * @param date 格式“yyyy-MM-dd”
          */
         void onDateSelected(List<String> date);
@@ -108,11 +106,17 @@ public class DatePicker extends LinearLayout {
 
 
     public DatePicker(Context context) {
-        this(context, null);
+        this(context, null, 0);
     }
 
     public DatePicker(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
+
+
+    }
+
+    public DatePicker(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
         mTManager = DPTManager.getInstance();
         mLManager = DPLManager.getInstance();
 
@@ -126,8 +130,8 @@ public class DatePicker extends LinearLayout {
         initWeekBar(context, llParams);
         // ------------------------------------------------------------------------------------月视图
         initMonthView(context, llParams);
-
     }
+
 
     /**
      * 初始化月视图
@@ -163,7 +167,7 @@ public class DatePicker extends LinearLayout {
             @Override
             public void onDateChange(int year, int month) {
                 if (onDateChangeListener != null) {
-                    onDateChangeListener.onDateChange(year,month);
+                    onDateChangeListener.onDateChange(year, month);
                 }
             }
         });
@@ -233,10 +237,10 @@ public class DatePicker extends LinearLayout {
         tsYear.setFactory(new ViewSwitcher.ViewFactory() {
             @Override
             public View makeView() {
-                TextView d = new TextView(context);
-                d.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
-                d.setTextColor(mTManager.colorTitle());
-                return d;
+                TextView tmpView = new TextView(context);
+                tmpView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+                tmpView.setTextColor(mTManager.colorTitle());
+                return tmpView;
             }
         });
         tsYear.setText(calendar.get(Calendar.YEAR) + "");
@@ -248,10 +252,10 @@ public class DatePicker extends LinearLayout {
         tsMonth.setFactory(new ViewSwitcher.ViewFactory() {
             @Override
             public View makeView() {
-                TextView d = new TextView(context);
-                d.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
-                d.setTextColor(mTManager.colorTitle());
-                return d;
+                TextView tmpView = new TextView(context);
+                tmpView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+                tmpView.setTextColor(mTManager.colorTitle());
+                return tmpView;
             }
         });
         tsMonth.setText(mLManager.titleMonth()[calendar.get(Calendar.MONTH)]);
@@ -284,6 +288,27 @@ public class DatePicker extends LinearLayout {
         ((TextView) rlTitle.getChildAt(2)).setText(mLManager.titleEnsure());
     }
 
+    private void updateTitleBarAndWeekBar() {
+        //更新背景
+        rlTitle.setBackgroundColor(mTManager.colorTitleBG());
+        llWeek.setBackgroundColor(mTManager.colorTitleBG());
+
+        //更新文字颜色
+        if (tsYear.getChildAt(0) instanceof TextView) {
+            ((TextView) tsYear.getChildAt(0)).setTextColor(mTManager.colorTitle());
+            ((TextView) tsYear.getChildAt(1)).setTextColor(mTManager.colorTitle());
+        }
+        if (tsMonth.getChildAt(0) instanceof TextView) {
+            ((TextView) tsMonth.getChildAt(0)).setTextColor(mTManager.colorTitle());
+            ((TextView) tsMonth.getChildAt(1)).setTextColor(mTManager.colorTitle());
+        }
+        tvEnsure.setTextColor(mTManager.colorTitle());
+        for (int i = 0; i < llWeek.getChildCount(); i++) {
+            ((TextView) llWeek.getChildAt(i)).setTextColor(mTManager.colorTitle());
+        }
+
+
+    }
     //************************************************************************************************
     //-------------------------------------------开放接口---------------------------------------------
     //************************************************************************************************
@@ -377,7 +402,7 @@ public class DatePicker extends LinearLayout {
     }
 
     /**
-     * 显示延期
+     * 显示补休
      *
      * @param isDeferredDisplay
      */
@@ -442,11 +467,21 @@ public class DatePicker extends LinearLayout {
     /**
      * 设置语言
      *
-     * @param language
+     * @param manager
      */
-    public void setLanguage(DPLManager language) {
-        this.mLManager = language;
+    public void setLanguage(DPLManager manager) {
+        this.mLManager = manager;
         updateTitleAndWeekView();
+    }
+
+    /**
+     * 设置显示主题
+     *
+     * @param theme
+     */
+    public void setTheme(DPTheme theme) {
+        DPTManager.getInstance().initCalendar(theme);
+        updateTitleBarAndWeekBar();
     }
 
 
@@ -496,12 +531,12 @@ public class DatePicker extends LinearLayout {
 
     /**
      * 设置日期变化监听器
+     *
      * @param onDateChangeListener
      */
-    public void setOnDateChangeListener(OnDateChangeListener onDateChangeListener){
-        this.onDateChangeListener=onDateChangeListener;
+    public void setOnDateChangeListener(OnDateChangeListener onDateChangeListener) {
+        this.onDateChangeListener = onDateChangeListener;
     }
-
 
 
 }

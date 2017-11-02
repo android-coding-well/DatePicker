@@ -16,6 +16,7 @@ import java.util.List;
 
 import cn.aigestudio.datepicker.bizs.calendars.DPCManager;
 import cn.aigestudio.datepicker.bizs.decors.DPDecor;
+import cn.aigestudio.datepicker.bizs.themes.DPCNTheme;
 import cn.aigestudio.datepicker.cons.DPLanguage;
 import cn.aigestudio.datepicker.cons.DPMode;
 import cn.aigestudio.datepicker.demo.databinding.ActivityDatePickerBinding;
@@ -64,7 +65,68 @@ public class DatePickerActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 binding.dpDate.setLanguage(isChecked?DPLanguage.ENGLISH: DPLanguage.CHINESE);
-               // binding.dpDate.setLanguage(isChecked?new EN(): new CN());
+            }
+        });
+
+
+        //自定义主题
+        binding.sTheme.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
+                binding.dpDate.setTheme(new DPCNTheme(){
+                    @Override
+                    public int colorDeferred() {
+                        return isChecked?0xFF123456:super.colorDeferred();
+                    }
+                    @Override
+                    public int colorL() {
+                        return isChecked?0xFF123456:super.colorL();
+                    }
+                    @Override
+                    public int colorTitleBG() {
+                        return isChecked?0xFFFF00FF:super.colorTitleBG();
+                    }
+
+                    @Override
+                    public int colorToday() {
+                        return isChecked?0xFF00FFFF:super.colorToday();
+                    }
+
+                    @Override
+                    public int colorTitle() {
+                        return isChecked?0xFFFFFF00:super.colorTitle();
+                    }
+
+                    @Override
+                    public int colorBG() {
+                        return isChecked?0xFFaaaaaa:super.colorBG();
+                    }
+
+                    @Override
+                    public int colorBGCircle() {
+                        return isChecked?0xFFa45F00:super.colorBGCircle();
+                    }
+
+                    @Override
+                    public int colorG() {
+                      return   isChecked?0xFFFF1234:super.colorG();
+                    }
+
+                    @Override
+                    public int colorF() {
+                        return   isChecked?0xFFFdf341:super.colorG();
+                    }
+
+                    @Override
+                    public int colorWeekend() {
+                        return   isChecked?0xFF0000FF:super.colorWeekend();
+                    }
+
+                    @Override
+                    public int colorHoliday() {
+                        return   isChecked?0xFFFF0000:super.colorHoliday();
+                    }
+                });
             }
         });
     }
@@ -192,5 +254,7 @@ public class DatePickerActivity extends AppCompatActivity {
         tmp2.add("2016-7-09");
         tmp2.add("2017-7-10");
         DPCManager.getInstance().setDecorTR(tmp2);
+
+
     }
 }

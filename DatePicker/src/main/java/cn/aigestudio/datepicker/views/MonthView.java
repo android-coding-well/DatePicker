@@ -65,10 +65,11 @@ public class MonthView extends View {
 
         /**
          * 日期变化
+         *
          * @param year
          * @param month 1-12
          */
-        void onDateChange(int year,int month);
+        void onDateChange(int year, int month);
     }
 
     private enum SlideMode {
@@ -132,7 +133,6 @@ public class MonthView extends View {
 
     public MonthView(Context context) {
         this(context, null, 0);
-
     }
 
     public MonthView(Context context, AttributeSet attrs) {
@@ -529,183 +529,6 @@ public class MonthView extends View {
         }
     }
 
-    /**
-     * 获得选择的日期列表
-     *
-     * @return
-     */
-    public List<String> getDateSelected() {
-        return dateSelected;
-    }
-
-    /**
-     * 设置日期变化监听器
-     *
-     * @param onDateChangeListener
-     */
-    void setOnDateChangeListener(OnDateChangeListener onDateChangeListener) {
-        this.onDateChangeListener = onDateChangeListener;
-    }
-
-    /**
-     * 设置日期选择监听器
-     *
-     * @param onDatePickedListener
-     */
-    public void setOnDatePickedListener(DatePicker.OnDatePickedListener onDatePickedListener) {
-        this.onDatePickedListener = onDatePickedListener;
-    }
-
-    /**
-     * 设置日期选择模式
-     *
-     * @param mode
-     */
-    public void setDPMode(DPMode mode) {
-        this.mDPMode = mode;
-    }
-
-    /**
-     * 设置装饰器
-     *
-     * @param decor
-     */
-    public void setDPDecor(DPDecor decor) {
-        this.mDPDecor = decor;
-    }
-
-    /**
-     * 获得装饰器
-     *
-     * @return
-     */
-    public DPMode getDPMode() {
-        return mDPMode;
-    }
-
-    /**
-     * 设置显示年月
-     *
-     * @param year  年份
-     * @param month 月份 1-12
-     */
-    public void setDisplayDate(int year, int month) {
-        if (month < 1) {
-            month = 1;
-        }
-        if (month > 12) {
-            month = 12;
-        }
-        centerYear = year;
-        centerMonth = month;
-        indexYear = 0;
-        indexMonth = 0;
-        buildRegion();
-        computeDate();
-        requestLayout();
-        invalidate();
-    }
-
-    /**
-     * 设置显示年月
-     *
-     * @param date 日期
-     */
-    public void setDisplayDate(Date date) {
-        if (date == null) {
-            Log.e(TAG, "setDate: date is null");
-            return;
-        }
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        setDisplayDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1);
-    }
-
-    /**
-     * 设置显示年月
-     *
-     * @param timestamp 时间戳
-     */
-    public void setDisplayDate(long timestamp) {
-        if (timestamp == 0) {
-            Log.e(TAG, "setDate: timestamp is 0");
-            return;
-        }
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(timestamp);
-        setDisplayDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1);
-    }
-
-    /**
-     * 设置显示年月
-     *
-     * @param dateFormat 格式化日志字符串，“yyyy-MM-dd”
-     * @throws ParseException 字符串不符合规则
-     */
-    public void setDisplayDate(String dateFormat) throws ParseException {
-        if (TextUtils.isEmpty(dateFormat)) {
-            Log.e(TAG, "setDate: dateFormat is empty");
-            return;
-        }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(sdf.parse(dateFormat));
-        setDisplayDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1);
-    }
-
-
-
-    /**
-     * 获得当前显示年份
-     * @return
-     */
-    public int getDisplayYear() {
-        return centerYear;
-    }
-
-    /**
-     * 获得当前显示月份（1-12）
-     * @return
-     */
-    public int getDisplayMonth() {
-        return centerMonth;
-    }
-
-    /**
-     * 设置是否显示节日
-     *
-     * @param isFestivalDisplay
-     */
-    public void setFestivalDisplay(boolean isFestivalDisplay) {
-        this.isFestivalDisplay = isFestivalDisplay;
-    }
-
-    /**
-     * 设置是否显示当天
-     *
-     * @param isTodayDisplay
-     */
-    public void setTodayDisplay(boolean isTodayDisplay) {
-        this.isTodayDisplay = isTodayDisplay;
-    }
-
-    /**
-     * 设置是否显示假日
-     *
-     * @param isHolidayDisplay
-     */
-    public void setHolidayDisplay(boolean isHolidayDisplay) {
-        this.isHolidayDisplay = isHolidayDisplay;
-    }
-
-    /**
-     * 设置是否延期显示
-     *
-     * @param isDeferredDisplay
-     */
-    public void setDeferredDisplay(boolean isDeferredDisplay) {
-        this.isDeferredDisplay = isDeferredDisplay;
-    }
 
     private void smoothScrollTo(int fx, int fy) {
         int dx = fx - mScroller.getFinalX();
@@ -930,7 +753,7 @@ public class MonthView extends View {
             leftMonth = 12;
         }
         if (null != onDateChangeListener) {
-            onDateChangeListener.onDateChange(centerYear,centerMonth);
+            onDateChangeListener.onDateChange(centerYear, centerMonth);
             onDateChangeListener.onYearChange(centerYear);
             onDateChangeListener.onMonthChange(centerMonth);
         }
@@ -957,7 +780,7 @@ public class MonthView extends View {
             leftMonth = 12;
         }
         if (null != onDateChangeListener) {
-            onDateChangeListener.onDateChange(centerYear,centerMonth);
+            onDateChangeListener.onDateChange(centerYear, centerMonth);
             if (SlideMode.VER == slideMode) {
                 onDateChangeListener.onYearChange(centerYear);
             } else {
@@ -1016,5 +839,189 @@ public class MonthView extends View {
         public void onAnimationUpdate(ValueAnimator animation) {
             MonthView.this.invalidate();
         }
+    }
+
+
+    //*************************************************************************************
+    //------------------------------开放接口----------------------------------------------
+    //*************************************************************************************
+
+    /**
+     * 获得选择的日期列表
+     *
+     * @return
+     */
+    public List<String> getDateSelected() {
+        return dateSelected;
+    }
+
+    /**
+     * 设置日期变化监听器
+     *
+     * @param onDateChangeListener
+     */
+    void setOnDateChangeListener(OnDateChangeListener onDateChangeListener) {
+        this.onDateChangeListener = onDateChangeListener;
+    }
+
+    /**
+     * 设置日期选择监听器
+     *
+     * @param onDatePickedListener
+     */
+    public void setOnDatePickedListener(DatePicker.OnDatePickedListener onDatePickedListener) {
+        this.onDatePickedListener = onDatePickedListener;
+    }
+
+    /**
+     * 设置日期选择模式
+     *
+     * @param mode
+     */
+    public void setDPMode(DPMode mode) {
+        this.mDPMode = mode;
+    }
+
+    /**
+     * 设置装饰器
+     *
+     * @param decor
+     */
+    public void setDPDecor(DPDecor decor) {
+        this.mDPDecor = decor;
+    }
+
+    /**
+     * 获得日期选择模式
+     *
+     * @return
+     */
+    public DPMode getDPMode() {
+        return mDPMode;
+    }
+
+    /**
+     * 设置显示年月
+     *
+     * @param year  年份
+     * @param month 月份 1-12
+     */
+    public void setDisplayDate(int year, int month) {
+        if (month < 1) {
+            month = 1;
+        }
+        if (month > 12) {
+            month = 12;
+        }
+        centerYear = year;
+        centerMonth = month;
+        indexYear = 0;
+        indexMonth = 0;
+        buildRegion();
+        computeDate();
+        requestLayout();
+        invalidate();
+    }
+
+    /**
+     * 设置显示年月
+     *
+     * @param date 日期
+     */
+    public void setDisplayDate(Date date) {
+        if (date == null) {
+            Log.e(TAG, "setDate: date is null");
+            return;
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        setDisplayDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1);
+    }
+
+    /**
+     * 设置显示年月
+     *
+     * @param timestamp 时间戳
+     */
+    public void setDisplayDate(long timestamp) {
+        if (timestamp == 0) {
+            Log.e(TAG, "setDate: timestamp is 0");
+            return;
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timestamp);
+        setDisplayDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1);
+    }
+
+    /**
+     * 设置显示年月
+     *
+     * @param dateFormat 格式化日志字符串，“yyyy-MM-dd”
+     * @throws ParseException 字符串不符合规则
+     */
+    public void setDisplayDate(String dateFormat) throws ParseException {
+        if (TextUtils.isEmpty(dateFormat)) {
+            Log.e(TAG, "setDate: dateFormat is empty");
+            return;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(sdf.parse(dateFormat));
+        setDisplayDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1);
+    }
+
+
+    /**
+     * 获得当前显示年份
+     *
+     * @return
+     */
+    public int getDisplayYear() {
+        return centerYear;
+    }
+
+    /**
+     * 获得当前显示月份（1-12）
+     *
+     * @return
+     */
+    public int getDisplayMonth() {
+        return centerMonth;
+    }
+
+    /**
+     * 设置是否显示节日
+     *
+     * @param isFestivalDisplay
+     */
+    public void setFestivalDisplay(boolean isFestivalDisplay) {
+        this.isFestivalDisplay = isFestivalDisplay;
+    }
+
+    /**
+     * 设置是否显示当天
+     *
+     * @param isTodayDisplay
+     */
+    public void setTodayDisplay(boolean isTodayDisplay) {
+        this.isTodayDisplay = isTodayDisplay;
+    }
+
+    /**
+     * 设置是否显示假日
+     *
+     * @param isHolidayDisplay
+     */
+    public void setHolidayDisplay(boolean isHolidayDisplay) {
+        this.isHolidayDisplay = isHolidayDisplay;
+    }
+
+    /**
+     * 设置是否显示补休
+     *
+     * @param isDeferredDisplay
+     */
+    public void setDeferredDisplay(boolean isDeferredDisplay) {
+        this.isDeferredDisplay = isDeferredDisplay;
     }
 }

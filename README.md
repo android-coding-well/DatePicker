@@ -1,4 +1,5 @@
-修改记录：重写演示demo,优化代码，增加部分接口，增加中英切换功能，修复日期数字前不能有0的bug
+修改记录：
+重写演示demo,优化代码，增加部分接口，增加中英切换功能，修复日期数字前不能有0的bug,增加自定义主题接口，修复英文下周视图错序的bug,增加动态添加选择日期，开放月视图相关接口，支持更高级别自定义。
 
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-DatePicker-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1864)

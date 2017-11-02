@@ -14,6 +14,7 @@ https://github.com/AigeStudio/DatePicker
 ![image](https://github.com/huweijian5/DatePicker/blob/master/screenshot/DecorExample.jpg)
 ----
 ![gif](https://github.com/huweijian5/DatePicker/blob/master/screenshot/dp.gif)
+![gif](https://github.com/huweijian5/DatePicker/blob/master/screenshot/PreviewGif.gif)
 
 ---
 ##介绍说明

@@ -62,6 +62,13 @@ public class MonthView extends View {
          * @param year
          */
         void onYearChange(int year);
+
+        /**
+         * 日期变化
+         * @param year
+         * @param month 1-12
+         */
+        void onDateChange(int year,int month);
     }
 
     private enum SlideMode {
@@ -923,6 +930,7 @@ public class MonthView extends View {
             leftMonth = 12;
         }
         if (null != onDateChangeListener) {
+            onDateChangeListener.onDateChange(centerYear,centerMonth);
             onDateChangeListener.onYearChange(centerYear);
             onDateChangeListener.onMonthChange(centerMonth);
         }
@@ -949,6 +957,7 @@ public class MonthView extends View {
             leftMonth = 12;
         }
         if (null != onDateChangeListener) {
+            onDateChangeListener.onDateChange(centerYear,centerMonth);
             if (SlideMode.VER == slideMode) {
                 onDateChangeListener.onYearChange(centerYear);
             } else {

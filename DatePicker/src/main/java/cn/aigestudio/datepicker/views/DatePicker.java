@@ -36,9 +36,25 @@ public class DatePicker extends LinearLayout {
 
 
     /**
+     * 日期变化监听器
+     */
+    public interface OnDateChangeListener{
+        /**
+         *
+         * @param year 年份
+         * @param month 月份1-12
+         */
+        void onDateChange(int year,int month);
+    }
+
+    /**
      * 日期单选监听器
      */
     public interface OnDatePickedListener {
+        /**
+         *
+         * @param date 格式“yyyy-MM-dd”
+         */
         void onDatePicked(String date);
     }
 
@@ -46,6 +62,10 @@ public class DatePicker extends LinearLayout {
      * 日期多选监听器
      */
     public interface OnDateSelectedListener {
+        /**
+         *
+         * @param date 格式“yyyy-MM-dd”
+         */
         void onDateSelected(List<String> date);
     }
 
@@ -80,6 +100,7 @@ public class DatePicker extends LinearLayout {
     private OnDateSelectedListener onDateSelectedListener;// 日期多选后监听
     private OnYearChangeListener onYearChangeListener;
     private OnMonthChangeListener onMonthChangeListener;
+    private OnDateChangeListener onDateChangeListener;
 
     private RelativeLayout rlTitle;
     private LinearLayout llWeek;
@@ -136,6 +157,13 @@ public class DatePicker extends LinearLayout {
                     tmp = tmp.replace("-", mLManager.titleBC());
                 }
                 tsYear.setText(tmp);
+            }
+
+            @Override
+            public void onDateChange(int year, int month) {
+                if (onDateChangeListener != null) {
+                    onDateChangeListener.onDateChange(year,month);
+                }
             }
         });
         addView(monthView, llParams);
@@ -463,6 +491,15 @@ public class DatePicker extends LinearLayout {
     public void setOnMonthChangeListener(OnMonthChangeListener onMonthChangeListener) {
         this.onMonthChangeListener = onMonthChangeListener;
     }
+
+    /**
+     * 设置日期变化监听器
+     * @param onDateChangeListener
+     */
+    public void setOnDateChangeListener(OnDateChangeListener onDateChangeListener){
+        this.onDateChangeListener=onDateChangeListener;
+    }
+
 
 
 }

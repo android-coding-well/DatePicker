@@ -131,6 +131,13 @@ public class DatePickerActivity extends AppCompatActivity {
             }
         });
 
+        binding.dpDate.setOnDateChangeListener(new DatePicker.OnDateChangeListener() {
+            @Override
+            public void onDateChange(int year, int month) {
+                Toast.makeText(DatePickerActivity.this, "年份:"+year+",月份:"+month, Toast.LENGTH_SHORT).show();
+            }
+        });
+
         binding.dpDate.setDPDecor(new DPDecor() {
             @Override
             public void drawDecorTL(Canvas canvas, Rect rect, Paint paint, String data) {

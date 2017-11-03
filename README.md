@@ -2,7 +2,7 @@
 * 一个非常简单易用又易于扩展的日期控件。
 ---
 ## 声明
-此项目fork于[DatePicker](https://github.com/AigeStudio/DatePicker),由于作者已停止更新，但其中仍有bug同时也未能满足我的一些自定义需求，故对其源码进行了修改。
+* 此项目fork于[DatePicker](https://github.com/AigeStudio/DatePicker),由于作者已停止更新，但其中仍有bug同时也未能满足我的一些自定义需求，故对其源码进行了修改。
 ---
 ## 效果预览
 ![image](https://github.com/huweijian5/DatePicker/blob/master/screenshot/BG.jpg)

@@ -1,15 +1,10 @@
-修改记录：
-重写演示demo,优化代码，增加部分接口，增加中英切换功能，修复日期数字前不能有0的bug,增加自定义主题接口，修复英文下周视图错序的bug,增加动态添加选择日期，开放月视图相关接口，支持更高级别自定义。
-
-
-
-
 # DatePicker
-
-## 原项目地址
-https://github.com/AigeStudio/DatePicker
-
+* 一个非常简单易用又易于扩展的日期控件。
 ---
+## 声明
+此项目fork于[DatePicker](https://github.com/AigeStudio/DatePicker),由于作者已停止更新，但其中仍有bug同时也未能满足我的一些自定义需求，故对其源码进行了修改。
+---
+## 效果预览
 ![image](https://github.com/huweijian5/DatePicker/blob/master/screenshot/BG.jpg)
 ![image](https://github.com/huweijian5/DatePicker/blob/master/screenshot/DecorExample.jpg)
 ----
@@ -17,9 +12,24 @@ https://github.com/AigeStudio/DatePicker
 ![gif](https://github.com/huweijian5/DatePicker/blob/master/screenshot/PreviewGif.gif)
 
 ---
-##介绍说明
+## 修改记录
+* 优化代码，增加部分接口
+* 增加中英切换功能
+* 修复日期数字前不能有0的bug
+* 增加自定义主题接口，
+* 修复英文下周视图错序的bug
+* 增加动态添加选择日期
+* 开放月视图相关接口
+* 支持更高级别自定义
+* 重写演示demo
+* ...
+
 ---
-##使用说明
+## 介绍说明
+
+
+---
+## 使用说明
 
 
 ---
